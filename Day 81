@@ -1,0 +1,35 @@
+class Solution
+{
+    private static final int MOD = 1000000007;
+
+    public int sumK(Node root, int k) {
+        Map<Integer, Integer> prefixSumCount = new HashMap<>();
+        prefixSumCount.put(0, 1); // Initialize with 0 sum count
+
+        return countPaths(root, 0, k, prefixSumCount);
+    }
+
+    private int countPaths(Node node, int currentSum, int target, Map<Integer, Integer> prefixSumCount) {
+        if (node == null) {
+            return 0;
+        }
+
+        currentSum += node.data;
+        int complement = currentSum - target;
+
+        // Count the number of paths ending at the current node with the target sum
+        int pathCount = prefixSumCount.getOrDefault(complement, 0);
+
+        // Update the prefix sum count
+        prefixSumCount.put(currentSum, prefixSumCount.getOrDefault(currentSum, 0) + 1);
+
+        // Recursively check the left and right subtrees
+        pathCount += countPaths(node.left, currentSum, target, prefixSumCount);
+        pathCount += countPaths(node.right, currentSum, target, prefixSumCount);
+
+        // Backtrack: Remove the current node's contribution to the prefix sum count
+        prefixSumCount.put(currentSum, prefixSumCount.get(currentSum) - 1);
+
+        return pathCount % MOD;
+    }
+}
